@@ -54,7 +54,8 @@ func (a *App) search(query string) {
 	fmt.Printf("%s\n", initialOutputBytes)
 	fmt.Println("\"Finished\"")
 
-	c := openai.NewClient("")
+	api_key, _ := utils.RetrieveApiKey()
+	c := openai.NewClient(api_key)
 	ctx := context.Background()
 
 	req := openai.ChatCompletionRequest{

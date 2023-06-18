@@ -1,10 +1,18 @@
 package utils
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"golang.design/x/clipboard"
+	"os"
 	"strings"
+	"time"
 	"unicode"
 )
+
+const CONFIG_FILE = "config.json"
+const PLUGIN_PATH = "/.local/share/pop-launcher/plugins/quick-ask-chatgpt/"
 
 func CopyToClipboard(content string) (string, error) {
 	err := clipboard.Init()
@@ -14,7 +22,6 @@ func CopyToClipboard(content string) (string, error) {
 	}
 
 	clipboard.Write(clipboard.FmtText, []byte(content))
-
 	return "Successfully copied to clipboard", nil
 }
 
@@ -59,4 +66,44 @@ func SplitLongString(s string, char_limit uint) string {
 	}
 
 	return result.String()
+}
+
+func RetrieveApiKey() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", errors.New("error getting current working directory")
+	}
+
+	data, err := os.ReadFile(cwd + PLUGIN_PATH + CONFIG_FILE)
+	if err != nil {
+		return "", errors.New("error reading config file")
+	}
+
+	var api_key string = ""
+	var config map[string]interface{}
+
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		return "", errors.New("error parsing config file")
+	}
+
+	if config["OPENAI_API_KEY"] != nil {
+		api_key = config["OPENAI_API_KEY"].(string)
+	} else {
+		return "", errors.New("OPENAI_API_KEY not found in config file")
+	}
+
+	return api_key, nil
+}
+
+func LogToFile(file string, s string) {
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer f.Close()
+
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	f.WriteString("[" + timestamp + "] " + s + "\n")
 }
