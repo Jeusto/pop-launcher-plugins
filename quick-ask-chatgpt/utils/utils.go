@@ -69,28 +69,24 @@ func SplitLongString(s string, char_limit uint) string {
 }
 
 func RetrieveApiKey() (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", errors.New("error getting current working directory")
-	}
-
-	data, err := os.ReadFile(cwd + PLUGIN_PATH + CONFIG_FILE)
-	if err != nil {
-		return "", errors.New("error reading config file")
-	}
+	home := os.Getenv("HOME")
+	data, read_file_error := os.ReadFile(home + PLUGIN_PATH + CONFIG_FILE)
 
 	var api_key string = ""
 	var config map[string]interface{}
+	parse_error := json.Unmarshal(data, &config)
 
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		return "", errors.New("error parsing config file")
+	if read_file_error != nil || parse_error != nil {
+		return "", errors.New("error reading or parsing config file")
 	}
 
-	if config["OPENAI_API_KEY"] != nil {
-		api_key = config["OPENAI_API_KEY"].(string)
-	} else {
+	if config["OPENAI_API_KEY"] == nil {
 		return "", errors.New("OPENAI_API_KEY not found in config file")
+	}
+
+	api_key = config["OPENAI_API_KEY"].(string)
+	if api_key == "" {
+		return "", errors.New("OPENAI_API_KEY in the config is empty")
 	}
 
 	return api_key, nil
