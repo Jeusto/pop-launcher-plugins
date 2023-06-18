@@ -1,0 +1,13 @@
+(
+    name: "Quick ask ChatGPT",
+    description: "Syntax: ask <query>\nExample: ask what is the meaning of life?",
+    bin: (path: "quick-ask-chatgpt"),
+    icon: Name("org.gnome.Documents-symbolic"),
+    query: (
+        regex: "^(ask).+",
+        help: "ask",
+        isolate: true,
+        no_sort: true,
+        history: false
+    ),
+)
