@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.design/x/clipboard"
 	"os"
 	"strings"
 	"time"
@@ -13,17 +12,6 @@ import (
 
 const CONFIG_FILE = "config.json"
 const PLUGIN_PATH = "/.local/share/pop-launcher/plugins/quick-ask-chatgpt/"
-
-func CopyToClipboard(content string) (string, error) {
-	err := clipboard.Init()
-
-	if err != nil {
-		return "", err
-	}
-
-	clipboard.Write(clipboard.FmtText, []byte(content))
-	return "Successfully copied to clipboard", nil
-}
 
 func SplitLongString(s string, char_limit uint) string {
 	var result strings.Builder
