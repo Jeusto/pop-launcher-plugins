@@ -8,28 +8,26 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-const AI_MODEL = openai.GPT3Dot5Turbo
-const PROMPT = "Respond in a concise way to the following user query. The result should be in a single line with no special formatting:"
-const RESPONSE_TOKEN_LIMIT = 500
-const CHAR_LIMIT = 80
-
 type ChatAPI struct {
-	ApiKey string
+	ApiKey    string
+	MaxTokens int
+	Prompt    string
 }
 
 func (c *ChatAPI) GetResponse(query string) (<-chan string, error) {
 	ctx := context.Background()
 	req := openai.ChatCompletionRequest{
-		Model:     AI_MODEL,
-		MaxTokens: RESPONSE_TOKEN_LIMIT,
+		Model:     openai.GPT3Dot5Turbo,
+		MaxTokens: c.MaxTokens,
 		Stream:    true,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: PROMPT + query,
+				Content: c.Prompt + query,
 			},
 		},
 	}
+
 	stream, err := c.createChatCompletionStream(ctx, req)
 	if err != nil {
 		return nil, err
@@ -59,6 +57,10 @@ func (c *ChatAPI) createChatCompletionStream(ctx context.Context, req openai.Cha
 	return client.CreateChatCompletionStream(ctx, req)
 }
 
-func New(apiKey string) *ChatAPI {
-	return &ChatAPI{ApiKey: apiKey}
+func New(apiKey string, maxTokens int, prompt string) *ChatAPI {
+	return &ChatAPI{
+		ApiKey:    apiKey,
+		MaxTokens: maxTokens,
+		Prompt:    prompt,
+	}
 }

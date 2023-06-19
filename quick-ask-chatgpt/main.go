@@ -1,42 +1,34 @@
 package main
 
 import (
-	"bufio"
-	"encoding/json"
-	"os"
-
 	"quick-ask-chatgpt/ai"
 	"quick-ask-chatgpt/pop"
 	"quick-ask-chatgpt/utils"
-
-	"github.com/sashabaranov/go-openai"
 )
 
-const AI_MODEL = openai.GPT3Dot5Turbo
-const PROMPT = "Respond in a concise way to the following user query. The result should be in a single line with no special formatting: "
-const RESPONSE_TOKEN_LIMIT = 500
-const RESPONSE_TITLE = "ChatGPT says :"
+const MAX_TOKENS = 1000
 const CHAR_LIMIT = 80
 
+const HELP_TEXT = "Hi! How can I help you?\nStart typing and hit enter to send your query to ChatGPT."
+const PROMPT = `Provide a concise response to the following user question
+in a single line without any special formatting. Focus on the most relevant
+information. Respond like you're directly chatting with the person. Never try
+to complete user's query, you can tell him if the question is not complete or
+clear enough: `
+
 type Plugin struct {
-	api_response string
-	chat_api     *ai.ChatAPI
+	api_response       string
+	query              string
+	chat_api           *ai.ChatAPI
+	previous_questions []string
+	previous_answers   []string
 }
 
 func (plugin *Plugin) activate(index int) {
-	utils.CopyToClipboard(plugin.api_response)
-	pop.CloseLauncher()
-}
+	plugin.api_response = ""
+	pop.ClearInput()
 
-func (plugin *Plugin) search(query string) {
-	pop.ClearSearchResults()
-	pop.AppendResult(pop.PluginSearchResult{
-		Name:        RESPONSE_TITLE,
-		Description: "",
-	})
-	pop.Finish()
-
-	responseCh, err := plugin.chat_api.GetResponse(query)
+	responseCh, err := plugin.chat_api.GetResponse(plugin.query)
 	if err != nil {
 		pop.ShowErrorMessage(err.Error())
 		return
@@ -44,14 +36,26 @@ func (plugin *Plugin) search(query string) {
 
 	for response := range responseCh {
 		plugin.api_response += response
-		pop.ClearSearchResults()
-		pop.AppendResult(pop.PluginSearchResult{
-			Name:        RESPONSE_TITLE,
-			Description: utils.SplitLongString(plugin.api_response, CHAR_LIMIT),
-		})
-		pop.Finish()
-	}
+		plugin.api_response = utils.SplitLongString(plugin.api_response, CHAR_LIMIT)
 
+		pop.ShowSingleResult(pop.PluginSearchResult{
+			Name: plugin.api_response,
+		})
+	}
+}
+
+func (plugin *Plugin) search(query string) {
+	plugin.query = query
+
+	if len(plugin.api_response) > 0 {
+		pop.ShowSingleResult(pop.PluginSearchResult{
+			Name: plugin.api_response,
+		})
+	} else {
+		pop.ShowSingleResult(pop.PluginSearchResult{
+			Name: HELP_TEXT,
+		})
+	}
 }
 
 func main() {
