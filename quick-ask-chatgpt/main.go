@@ -62,7 +62,9 @@ func main() {
 	}
 
 	chat_api := ai.ChatAPI{
-		ApiKey: api_key,
+		ApiKey:    api_key,
+		Prompt:    PROMPT,
+		MaxTokens: MAX_TOKENS,
 	}
 
 	plugin := Plugin{
@@ -70,18 +72,14 @@ func main() {
 		chat_api:     &chat_api,
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		line := scanner.Text()
-		var request map[string]interface{}
-		if err := json.Unmarshal([]byte(line), &request); err != nil {
-			continue
-		}
+	requests := make(chan pop.Request)
+	go pop.HandleRequests(requests)
 
-		if _, ok := request["Search"]; ok {
-			plugin.search(request["Search"].(string))
-		} else if _, ok := request["Activate"]; ok {
-			plugin.activate(int(request["Activate"].(float64)))
+	for request := range requests {
+		if request.Type == "search" {
+			plugin.search(request.Query)
+		} else if request.Type == "activate" {
+			plugin.activate(request.ID)
 		}
 	}
 }

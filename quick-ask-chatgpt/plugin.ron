@@ -4,7 +4,7 @@
     bin: (path: "quick-ask-chatgpt"),
     icon: Name("org.gnome.Documents-symbolic"),
     query: (
-        regex: "^(ask).+",
+        regex: "^(ask)",
         help: "ask",
         isolate: true,
         no_sort: true,

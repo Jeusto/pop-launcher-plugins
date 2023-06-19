@@ -103,3 +103,10 @@ func LogToFile(file string, s string) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 	f.WriteString("[" + timestamp + "] " + s + "\n")
 }
+
+func Ternary[T any](condition bool, a T, b T) T {
+	if condition {
+		return a
+	}
+	return b
+}
