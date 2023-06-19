@@ -10,18 +10,16 @@ const MAX_TOKENS = 1000
 const CHAR_LIMIT = 80
 
 const HELP_TEXT = "Hi! How can I help you?\nStart typing and hit enter to send your query to ChatGPT."
-const PROMPT = `Provide a concise response to the following user question
+const INITIAL_PROMPT = `Provide a concise response to the following user question
 in a single line without any special formatting. Focus on the most relevant
 information. Respond like you're directly chatting with the person. Never try
 to complete user's query, you can tell him if the question is not complete or
 clear enough: `
 
 type Plugin struct {
-	api_response       string
-	query              string
-	chat_api           *ai.ChatAPI
-	previous_questions []string
-	previous_answers   []string
+	api_response string
+	query        string
+	chat_api     *ai.ChatAPI
 }
 
 func (plugin *Plugin) activate(index int) {
@@ -65,16 +63,8 @@ func main() {
 		return
 	}
 
-	chat_api := ai.ChatAPI{
-		ApiKey:    api_key,
-		Prompt:    PROMPT,
-		MaxTokens: MAX_TOKENS,
-	}
-
-	plugin := Plugin{
-		api_response: "",
-		chat_api:     &chat_api,
-	}
+	chat_api := ai.New(api_key, MAX_TOKENS, INITIAL_PROMPT)
+	plugin := Plugin{api_response: "", chat_api: chat_api}
 
 	requests := make(chan pop.Request)
 	go pop.HandleRequests(requests)
