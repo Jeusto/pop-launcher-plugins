@@ -73,9 +73,12 @@ func main() {
 	go pop.HandleRequests(requests)
 
 	for request := range requests {
-		if request.Type == "Search" {
+		switch request.Type {
+		case "Exit":
+			return
+		case "Search":
 			plugin.search(request.Query)
-		} else if request.Type == "Activate" {
+		case "Activate":
 			plugin.activate(request.ID)
 		}
 	}

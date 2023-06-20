@@ -78,33 +78,47 @@ func ClearInput() {
 
 func HandleRequests(requests chan<- Request) {
 	scanner := bufio.NewScanner(os.Stdin)
+	defer close(requests)
 
+	// Read from stdin and parse possible the received event
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		var request map[string]interface{}
-		if err := json.Unmarshal([]byte(line), &request); err != nil {
-			ShowErrorMessage(err.Error())
-			continue
-		}
-
-		if _, ok := request["Search"]; ok {
-			query := request["Search"].(string)
-			query = strings.Replace(query, "ask", "", 1)
-			query = strings.TrimSpace(query)
-
+		switch line {
+		case "\"Exit\"":
 			requests <- Request{
-				Type:  "search",
-				Query: query,
+				Type: "Exit",
 			}
-		}
-		if _, ok := request["Activate"]; ok {
+		case "\"Interrupt\"":
 			requests <- Request{
-				Type: "activate",
-				ID:   int(request["Activate"].(float64)),
+				Type: "Interrupt",
+			}
+		default:
+			var request map[string]interface{}
+
+			if err := json.Unmarshal([]byte(line), &request); err != nil {
+				ShowErrorMessage(err.Error())
+				continue
+			}
+
+			if _, ok := request["Search"]; ok {
+				requests <- Request{
+					Type:  "Search",
+					Query: cleanQuery(request["Search"].(string)),
+				}
+			}
+			if _, ok := request["Activate"]; ok {
+				requests <- Request{
+					Type: "Activate",
+					ID:   int(request["Activate"].(float64)),
+				}
 			}
 		}
 	}
+}
 
-	close(requests)
+func cleanQuery(query string) string {
+	query = strings.Join(strings.Split(query, " ")[1:], " ")
+	query = strings.TrimSpace(query)
+	return query
 }
