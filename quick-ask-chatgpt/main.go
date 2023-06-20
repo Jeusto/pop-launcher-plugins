@@ -7,7 +7,7 @@ import (
 )
 
 const MAX_TOKENS = 1000
-const CHAR_LIMIT = 80
+const LINE_WIDTH = 80
 
 const HELP_TEXT = "Hi! How can I help you?\nStart typing and hit enter to send your query to ChatGPT."
 const INITIAL_PROMPT = `Provide a concise response to the following user question
@@ -25,6 +25,9 @@ type Plugin struct {
 func (plugin *Plugin) activate(index int) {
 	plugin.api_response = ""
 	pop.ClearInput()
+	pop.ShowSingleResult(pop.PluginSearchResult{
+		Name: "Thinking...",
+	})
 
 	responseCh, err := plugin.chat_api.GetResponse(plugin.query)
 	if err != nil {
@@ -34,7 +37,7 @@ func (plugin *Plugin) activate(index int) {
 
 	for response := range responseCh {
 		plugin.api_response += response
-		plugin.api_response = utils.SplitLongString(plugin.api_response, CHAR_LIMIT)
+		plugin.api_response = utils.WrapText(plugin.api_response, LINE_WIDTH)
 
 		pop.ShowSingleResult(pop.PluginSearchResult{
 			Name: plugin.api_response,
@@ -65,14 +68,14 @@ func main() {
 
 	chat_api := ai.New(api_key, MAX_TOKENS, INITIAL_PROMPT)
 	plugin := Plugin{api_response: "", chat_api: chat_api}
-
 	requests := make(chan pop.Request)
+
 	go pop.HandleRequests(requests)
 
 	for request := range requests {
-		if request.Type == "search" {
+		if request.Type == "Search" {
 			plugin.search(request.Query)
-		} else if request.Type == "activate" {
+		} else if request.Type == "Activate" {
 			plugin.activate(request.ID)
 		}
 	}

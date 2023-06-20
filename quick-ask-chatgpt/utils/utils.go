@@ -7,53 +7,37 @@ import (
 	"os"
 	"strings"
 	"time"
-	"unicode"
 )
 
 const CONFIG_FILE = "config.json"
 const PLUGIN_PATH = "/.local/share/pop-launcher/plugins/quick-ask-chatgpt/"
 
-func SplitLongString(s string, char_limit uint) string {
-	var result strings.Builder
-	var line strings.Builder
-	var word strings.Builder
-	var lineWidth int
+func WrapText(s string, line_width int) string {
+	words := strings.Fields(s)
 
-	for _, r := range s {
-		if unicode.IsSpace(r) {
-			// Found a space or newline character.
-			// Add the current word to the current line,
-			// if it fits, otherwise start a new line.
-			if lineWidth+len(word.String())+1 <= int(char_limit) {
-				line.WriteString(word.String())
-				line.WriteRune(' ')
-				lineWidth += len(word.String()) + 1
-			} else {
-				result.WriteString(strings.TrimRight(line.String(), " "))
-				result.WriteRune('\n')
-				line.Reset()
-				line.WriteString(word.String())
-				line.WriteRune(' ')
-				lineWidth = len(word.String()) + 1
-			}
-			word.Reset()
+	// strings.Fields() removes trailing spaces, add one back if necessary
+	if strings.HasSuffix(s, " ") {
+		words = append(words, "")
+	}
+
+	if len(words) == 0 {
+		return ""
+	}
+
+	wrapped := words[0]
+	spaceLeft := line_width - len(wrapped)
+
+	for _, word := range words[1:] {
+		if len(word)+1 > spaceLeft {
+			wrapped += "\n" + word
+			spaceLeft = line_width - len(word)
 		} else {
-			// Found a non-space character, add it to the current word.
-			word.WriteRune(r)
+			wrapped += " " + word
+			spaceLeft -= 1 + len(word)
 		}
 	}
 
-	// Add the last word and line to the result.
-	if lineWidth+len(word.String()) <= 80 {
-		line.WriteString(word.String())
-		result.WriteString(strings.TrimRight(line.String(), " "))
-	} else {
-		result.WriteString(strings.TrimRight(line.String(), " "))
-		result.WriteRune('\n')
-		result.WriteString(word.String())
-	}
-
-	return result.String()
+	return wrapped
 }
 
 func RetrieveApiKey() (string, error) {

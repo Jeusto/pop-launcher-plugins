@@ -3,7 +3,6 @@ package ai
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 
 	"github.com/sashabaranov/go-openai"
@@ -22,8 +21,6 @@ func (c *ChatAPI) GetResponse(query string) (<-chan string, error) {
 		Role:    openai.ChatMessageRoleUser,
 		Content: query,
 	})
-
-	fmt.Println(c.Request)
 
 	stream, err := c.createChatCompletionStream(c.Request)
 	if err != nil {
@@ -46,7 +43,6 @@ func (c *ChatAPI) GetResponse(query string) (<-chan string, error) {
 			}
 			ch <- response.Choices[0].Delta.Content
 			full_result += response.Choices[0].Delta.Content
-
 		}
 
 		c.Request.Messages = append(c.Request.Messages, openai.ChatCompletionMessage{
