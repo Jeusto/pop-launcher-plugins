@@ -1,15 +1,14 @@
 import readline from "readline";
 import { log } from "./utils";
 
-// Plugin interface
 export interface PluginExt {
   name(): string;
   run(): void;
   search(query: string): void;
   activate(id: Index): void;
-  activate_context?(id: Index, context: Index): Promise<void>;
-  complete?(id: Index): Promise<void>;
-  context?(id: Index): Promise<void>;
+  activate_context?(id: Index, context: Index): void;
+  complete?(id: Index): void;
+  context?(id: Index): void;
   exit?(): void;
   interrupt?(): void;
   quit?(id: Index): void;
@@ -17,56 +16,75 @@ export interface PluginExt {
   init_logging?(): void;
 }
 
-// Main execution
-export function runPlugin<T extends PluginExt>(plugin: T) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: false,
-  });
+export class PopPlugin implements PluginExt {
+  name(): string {
+    return "pop";
+  }
 
-  rl.on("line", (line) => {
-    try {
-      const request: Request = JSON.parse(line) as Request;
-      log(JSON.stringify(request));
+  respond_with(response: PluginResponse) {
+    process.stdout.write(`${JSON.stringify(response)}\n`);
+  }
 
-      switch (request) {
-        case "Exit":
-          plugin.exit?.();
-        case "Interrupt":
-          plugin.interrupt?.();
+  run() {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: false,
+    });
 
-        default:
-          if ((request as ActivateEvent).Activate !== undefined) {
-            plugin.activate((request as ActivateEvent).Activate);
-          }
-          if ((request as ActivateContextEvent).ActivateContext !== undefined) {
-            const { id, context } = (request as ActivateContextEvent)
-              .ActivateContext;
-            plugin.activate_context?.(id, context);
-          }
-          if ((request as CompleteEvent).Complete !== undefined) {
-            plugin.complete?.((request as CompleteEvent).Complete);
-          }
-          if ((request as ContextEvent).Context !== undefined) {
-            plugin.context?.((request as ContextEvent).Context);
-          }
-          if ((request as QuitEvent).Quit !== undefined) {
-            plugin.quit?.((request as QuitEvent).Quit);
-          }
-          if ((request as SearchEvent).Search !== undefined) {
-            plugin.search((request as SearchEvent).Search);
-          }
+    rl.on("line", (line) => {
+      try {
+        const request: Request = JSON.parse(line) as Request;
+        log(request);
+
+        switch (request) {
+          case "Exit":
+            this.exit?.();
+          case "Interrupt":
+            this.interrupt?.();
+
+          default:
+            if ((request as ActivateEvent).Activate !== undefined) {
+              this.activate((request as ActivateEvent).Activate);
+            }
+            if (
+              (request as ActivateContextEvent).ActivateContext !== undefined
+            ) {
+              const { id, context } = (request as ActivateContextEvent)
+                .ActivateContext;
+              this.activate_context?.(id, context);
+            }
+            if ((request as CompleteEvent).Complete !== undefined) {
+              this.complete?.((request as CompleteEvent).Complete);
+            }
+            if ((request as ContextEvent).Context !== undefined) {
+              this.context?.((request as ContextEvent).Context);
+            }
+            if ((request as QuitEvent).Quit !== undefined) {
+              this.quit?.((request as QuitEvent).Quit);
+            }
+            if ((request as SearchEvent).Search !== undefined) {
+              this.search((request as SearchEvent).Search);
+            }
+        }
+      } catch (err) {
+        log(err);
       }
-    } catch (err) {
-      log("Error");
-      log(err as string);
-    }
-  });
-}
+    });
+  }
 
-export function respondWith(response: PluginResponse) {
-  process.stdout.write(`${JSON.stringify(response)}\n`);
+  search(query: string) {}
+  activate(id: Index) {}
+  complete(id: Index) {}
+
+  context(id: Index) {}
+  activate_context?(id: Index, context: Index): {};
+
+  exit() {}
+  interrupt() {}
+  quit(id: Index) {}
+
+  init_logging() {}
 }
 
 // PluginResponse Types

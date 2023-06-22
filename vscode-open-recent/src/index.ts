@@ -1,29 +1,28 @@
 #!/usr/bin/env node
-import { RecentlyOpened, Vscode } from "./vscode.js";
-import { PluginExt, PluginResponse, respondWith, runPlugin } from "./pop.js";
-import { cleanSearchQuery, getIcon, log } from "./utils.js";
+import { PopPlugin } from "./pop";
+import { cleanSearchQuery, getIcon, log } from "./utils";
+import { RecentlyOpened, Vscode } from "./vscode";
 
 // Main execution
-function main() {
-  Plugin.init().then((plugin) => {
-    log(JSON.stringify(plugin, null, 2));
-    runPlugin(plugin);
-  });
+async function main() {
+  const plugin = await VscodePlugin.init();
+  plugin.run();
 }
 
-class Plugin implements PluginExt {
-  vscode: Vscode | null;
+class VscodePlugin extends PopPlugin {
+  private vscode: Vscode | null;
   private query: string;
   private results: RecentlyOpened;
 
   private constructor(vscode: Vscode) {
-    this.vscode = vscode;
+    super();
     this.query = "";
-    this.results = [];
+    this.vscode = vscode;
+    this.results = vscode.recentlyOpened.slice(0, 8) || [];
   }
 
-  static async init(): Promise<Plugin> {
-    return new Plugin(await Vscode.init());
+  static async init(): Promise<VscodePlugin> {
+    return new VscodePlugin(await Vscode.init());
   }
 
   name(): string {
@@ -31,12 +30,13 @@ class Plugin implements PluginExt {
   }
 
   search(query: string) {
+    log("Search query: " + query);
     this.query = cleanSearchQuery(query, "vs");
 
     if (!this.query) {
-      this.respond("Clear");
-      this.vscode?.recentlyOpened.forEach((entry, idx) => {
-        this.respond({
+      this.respond_with("Clear");
+      this.results.forEach((entry, idx) => {
+        this.respond_with({
           Append: {
             id: idx,
             name: entry.name,
@@ -48,15 +48,16 @@ class Plugin implements PluginExt {
           },
         });
       });
-      this.respond("Finished");
+      log("Finished");
+      this.respond_with("Finished");
       return;
     }
 
     this.results = this.vscode?.search(this.query) || [];
 
     if (this.results.length === 0) {
-      this.respond("Clear");
-      this.respond({
+      this.respond_with("Clear");
+      this.respond_with({
         Append: {
           id: 0,
           name: "No results found.",
@@ -67,14 +68,13 @@ class Plugin implements PluginExt {
           window: null,
         },
       });
-
-      this.respond("Finished");
+      this.respond_with("Finished");
       return;
     }
 
-    this.respond("Clear");
+    this.respond_with("Clear");
     this.results.forEach((entry, idx) => {
-      this.respond({
+      this.respond_with({
         Append: {
           id: idx,
           name: entry.name,
@@ -86,25 +86,17 @@ class Plugin implements PluginExt {
         },
       });
     });
-    this.respond("Finished");
+    this.respond_with("Finished");
   }
 
   activate(index: number) {
     const entry = this.results[index];
     this.vscode?.open(entry);
-    this.respond("Close");
+    this.respond_with("Close");
   }
 
   exit(): void {
     process.exit(0);
-  }
-
-  run() {
-    runPlugin(this);
-  }
-
-  respond(response: PluginResponse) {
-    respondWith(response);
   }
 }
 
