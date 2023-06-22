@@ -1,6 +1,6 @@
 (
     name: "Find man pages",
-    description: "Syntax: { whatis }\nExample: whatis git",
+    description: "Syntax: whatis <query>\nExample: whatis git",
     bin: (path: "whatis.py"),
     icon: Name("org.gnome.Documents-symbolic"),
     query: (
