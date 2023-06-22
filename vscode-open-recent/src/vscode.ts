@@ -97,7 +97,7 @@ export class Vscode {
   }
 
   async open(entry: Entry) {
-    exec(`${EXECUTABLE} ${entry.path}`, (err) => {
+    exec(`${EXECUTABLE} ${entry.full_path}`, (err) => {
       if (err) {
         throw err;
       }
