@@ -1,0 +1,25 @@
+{
+  "name": "pop-launcher-vscode-open-recent",
+  "type": "module",
+  "scripts": {
+    "build": "tsup --config tsup.config.json",
+    "preview": "node dist/index.cjs",
+    "dev": "watch 'npm run build && npm run preview' src"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.10",
+    "esbuild": "^0.17.15",
+    "install": "^0.13.0",
+    "nodemon": "^2.0.22",
+    "npm": "^9.7.1",
+    "tsup": "^7.0.0",
+    "typescript": "^5.0.3"
+  },
+  "dependencies": {
+    "fuse.js": "^6.6.2",
+    "open": "^9.1.0",
+    "sqlite": "^4.2.1",
+    "sqlite3": "^5.1.6",
+    "watch": "^1.0.2"
+  }
+}

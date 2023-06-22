@@ -1,0 +1,13 @@
+(
+    name: "Vscode open recent",
+    description: "Open any recent file, project or workspace in Vscode\nSyntaxe: vs <search>",
+    bin: (path: "dist/index.cjs"),
+    icon: Name("/home/asaday/.local/share/pop-launcher/plugins/vscode-open-recent/assets/icon.png"),
+    query: (
+        regex: "^(vs)",
+        help: "vs",
+        isolate: true,
+        no_sort: true,
+        history: false
+    ),
+)

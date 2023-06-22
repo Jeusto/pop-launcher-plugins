@@ -2,6 +2,7 @@
     name: "Quick ask ChatGPT",
     description: "Syntax: ask <query>\nExample: ask what is the meaning of life?",
     bin: (path: "quick-ask-chatgpt"),
+    icon: Name("/home/asaday/.local/share/pop-launcher/plugins/quick-ask-chatgpt/icon.png"),
     query: (
         regex: "^(ask)",
         help: "ask",
