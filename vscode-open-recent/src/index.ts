@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { PopPlugin } from "./pop";
-import { cleanSearchQuery, getIcon, log } from "./utils";
+import { PopPlugin } from "pop-launcher-toolkit";
+import { cleanSearchQuery, getIcon } from "./utils";
 import { RecentlyOpened, Vscode } from "./vscode";
 
 // Main execution
@@ -30,7 +30,6 @@ class VscodePlugin extends PopPlugin {
   }
 
   search(query: string) {
-    log("Search query: " + query);
     this.query = cleanSearchQuery(query, "vs");
 
     if (!this.query) {
@@ -48,7 +47,6 @@ class VscodePlugin extends PopPlugin {
           },
         });
       });
-      log("Finished");
       this.respond_with("Finished");
       return;
     }

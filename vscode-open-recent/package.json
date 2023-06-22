@@ -18,6 +18,7 @@
   "dependencies": {
     "fuse.js": "^6.6.2",
     "open": "^9.1.0",
+    "pop-launcher-toolkit": "^1.0.0",
     "sqlite": "^4.2.1",
     "sqlite3": "^5.1.6",
     "watch": "^1.0.2"
