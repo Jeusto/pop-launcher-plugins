@@ -1,0 +1,13 @@
+(
+    name: "Find man pages",
+    description: "Syntax: { whatis }\nExample: whatis git",
+    bin: (path: "whatis.py"),
+    icon: Name("org.gnome.Documents-symbolic"),
+    query: (
+        regex: "^(whatis).+",
+        help: "whatis",
+        isolate: true,
+        no_sort: true,
+        history: false
+    ),
+)
