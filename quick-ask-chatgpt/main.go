@@ -9,7 +9,7 @@ import (
 const MAX_TOKENS = 1000
 const LINE_WIDTH = 80
 
-const HELP_TEXT = "Hi! How can I help you?\nStart typing and hit enter to send your query to ChatGPT."
+const HELP_TEXT = "Hi! How can I help you? Start typing and hit enter to send your query to ChatGPT."
 const INITIAL_PROMPT = `Provide a concise response to the following user question
 in a single line without any special formatting. Focus on the most relevant
 information. Respond like you're directly chatting with the person. Never try

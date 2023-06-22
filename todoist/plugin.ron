@@ -1,0 +1,13 @@
+(
+    name: "Todoist",
+    description: "Add or complete tasks in Todoist",
+    bin: (path: "dist/index.cjs"),
+    icon: Name("/home/asaday/.local/share/pop-launcher/plugins/todoist/assets/plugin.svg"),
+    query: (
+        regex: "^(todo)",
+        help: "todo",
+        isolate: true,
+        no_sort: false,
+        history: false
+    ),
+)

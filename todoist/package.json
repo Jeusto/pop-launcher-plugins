@@ -1,5 +1,5 @@
 {
-  "name": "pop-launcher-vscode-open-recent",
+  "name": "pop-launcher-todoist",
   "type": "module",
   "scripts": {
     "build": "tsup --config tsup.config.json",
@@ -7,11 +7,8 @@
     "dev": "watch 'npm run build && npm run preview' src"
   },
   "dependencies": {
-    "fuse.js": "^6.6.2",
-    "open": "^9.1.0",
     "pop-launcher-toolkit": "^1.0.0",
-    "sqlite": "^4.2.1",
-    "sqlite3": "^5.1.6"
+    "@doist/todoist-api-typescript": "^2.1.2"
   },
   "devDependencies": {
     "@types/node": "^18.15.10",
