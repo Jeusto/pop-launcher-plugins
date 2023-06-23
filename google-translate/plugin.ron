@@ -1,10 +1,10 @@
 (
     name: "Google translate",
-    description: "Translate text using Google Translate\nSyntax: tr <text> [source language] [fr language]\nExample: tr Hello world!\nExample 2: tr Hello world! fr en",
+    description: "Translate text using Google Translate\nSyntax: tr <text> [-- source_language target_language]",
     bin: (path: "target/debug/pop-launcher-google-translate"),
-    icon: Name("/home/asaday/.local/share/pop-launcher/plugins/google-translate/icon.png"),
+    icon: Name("/home/asaday/.local/share/pop-launcher/plugins/google-translate/icon.svg"),
     source_language: "en",
-    target_language: "es",
+    target_language: "fr",
     api_url: "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&dt=bd&dj=1",
     query: (
         regex: "^(tr)",
