@@ -48,7 +48,7 @@ class TodoistPlugin extends PopPlugin {
   }
 
   name(): string {
-    return "todoist";
+    return "Todoist";
   }
 
   show_options() {
@@ -108,6 +108,12 @@ class TodoistPlugin extends PopPlugin {
         break;
       case 1:
         await this.todoist.add_task(this.query);
+        this.show_notification(
+          "Task added successfully",
+          "Task: " + this.query,
+          "/home/asaday/.local/share/pop-launcher/plugins/todoist/assets/plugin.svg",
+          1000
+        );
         this.exit();
         break;
       default:

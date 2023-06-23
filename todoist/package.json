@@ -7,7 +7,7 @@
     "dev": "watch 'npm run build && npm run preview' src"
   },
   "dependencies": {
-    "pop-launcher-toolkit": "^1.0.0",
+    "pop-launcher-toolkit": "^1.2.0",
     "@doist/todoist-api-typescript": "^2.1.2"
   },
   "devDependencies": {

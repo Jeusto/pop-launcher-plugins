@@ -1,3 +1,4 @@
 {
-  "TODOIST_API_KEY": ""
+  "TODOIST_API_KEY": "",
+  "show_confirmation_notification": "true"
 }
