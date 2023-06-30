@@ -1,0 +1,13 @@
+(
+    name: "1pt.one URL shortener",
+    description: "Syntax: one <URL>\nExample: one jeusto.com",
+    bin: (path: "1pt.one"),
+    icon: Name("/home/asaday/.local/share/pop-launcher/plugins/1pt.one/icon.png"),
+    query: (
+        regex: "^(one)",
+        help: "one",
+        isolate: true,
+        no_sort: true,
+        history: false
+    ),
+)
